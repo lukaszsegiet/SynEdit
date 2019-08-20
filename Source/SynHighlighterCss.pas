@@ -51,28 +51,18 @@ http://www.ashleybrown.co.uk/
 ashley@ashleybrown.co.uk
 }
 
-{$IFNDEF QSYNHIGHLIGHTERCSS}
 unit SynHighlighterCSS;
-{$ENDIF}
 
 {$I SynEdit.Inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynHighlighterHashEntries,
-  QSynUnicode,
-{$ELSE}
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynHighlighterHashEntries,
   SynUnicode,
-{$ENDIF}
   SysUtils,
   Classes;
 
@@ -134,6 +124,7 @@ type
     procedure TildeProc;
     procedure PipeProc;
     procedure CircumflexProc;
+    procedure AttrContainProc;
     procedure EqualProc;
     procedure ExclamProc;
   protected
@@ -190,11 +181,7 @@ type
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
   SynEditStrConst;
-{$ENDIF}
 
 const
    Properties_CSS1 : UnicodeString =
@@ -668,6 +655,7 @@ begin
       '|': PipeProc;
       '=': EqualProc;
       '^': CircumflexProc;
+      '*': AttrContainProc;
     end;
     Exit;
   end;
@@ -706,6 +694,16 @@ begin
 end;
 
 procedure TSynCssSyn.CircumflexProc;
+begin
+  Inc(Run);
+  if FLine[Run] = '=' then
+  begin
+    Inc(Run);
+    FTokenID := tkSymbol;
+  end;
+end;
+
+procedure TSynCssSyn.AttrContainProc;
 begin
   Inc(Run);
   if FLine[Run] = '=' then
